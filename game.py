@@ -10,11 +10,23 @@ class Battleship:
         self._setup()
 
     def _setup(self):
-        self.player.place_ship({(1, 1), (1, 2), (1, 3)})
-        self.enemy.place_ship({(2, 2), (2, 3), (2, 4)})
+        # Ships of length 4, 3 and 2 for each side, as 0-indexed (row, col).
+        for cells in (
+            {(0, 0), (0, 1), (0, 2), (0, 3)},
+            {(2, 1), (3, 1), (4, 1)},
+            {(5, 4), (5, 5)},
+        ):
+            self.player.place_ship(cells)
+        for cells in (
+            {(1, 2), (2, 2), (3, 2), (4, 2)},
+            {(5, 0), (5, 1), (5, 2)},
+            {(3, 4), (3, 5)},
+        ):
+            self.enemy.place_ship(cells)
 
     def show(self):
         print("\nYour shots are coordinates like 2,3.")
+        print("Enemy ships afloat:", self.enemy.ships_afloat())
         print("Ship cells remaining:", len(self.enemy.ships - self.enemy.shots))
 
     def run(self):
@@ -36,14 +48,18 @@ class Battleship:
             if pos in self.enemy.shots:
                 print("Already fired there.")
                 continue
-            print("HIT!" if self.enemy.fire(pos) else "MISS!")
+            result = self.enemy.fire(pos)
+            print({"miss": "MISS!", "hit": "HIT!", "sunk": "HIT! SUNK!"}[result])
             if self.enemy.all_sunk():
                 print("You sank the fleet.")
                 return
 
             ai_pos = self.ai.choose()
             print(f"AI fired at {ai_pos[0] + 1},{ai_pos[1] + 1}")
-            if self.player.fire(ai_pos):
+            result = self.player.fire(ai_pos)
+            if result == "sunk":
+                print("AI sank one of your ships!")
+            elif result == "hit":
                 print("AI scored a hit.")
             if self.player.all_sunk():
                 print("The AI sank your fleet.")
