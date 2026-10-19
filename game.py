@@ -3,6 +3,8 @@ from ai import AI
 
 
 class Battleship:
+    RESULT_TEXT = {"miss": "MISS!", "hit": "HIT!", "sunk": "HIT! SUNK!"}
+
     def __init__(self):
         self.player = Board()
         self.enemy = Board()
@@ -49,7 +51,7 @@ class Battleship:
                 print("Already fired there.")
                 continue
             result = self.enemy.fire(pos)
-            print({"miss": "MISS!", "hit": "HIT!", "sunk": "HIT! SUNK!"}[result])
+            print(self.RESULT_TEXT[result])
             if self.enemy.all_sunk():
                 print("You sank the fleet.")
                 return
@@ -61,10 +63,7 @@ class Battleship:
             print(f"AI fired at {ai_pos[0] + 1},{ai_pos[1] + 1}")
             result = self.player.fire(ai_pos)
             self.ai.record(ai_pos, result in ("hit", "sunk"))
-            if result == "sunk":
-                print("AI sank one of your ships!")
-            elif result == "hit":
-                print("AI scored a hit.")
+            print("AI " + self.RESULT_TEXT[result])
             if self.player.all_sunk():
                 print("The AI sank your fleet.")
                 return
